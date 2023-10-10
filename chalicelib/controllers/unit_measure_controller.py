@@ -36,3 +36,73 @@ def list_unit_measure() -> list:
         })
     session.close()
     return get_all_unit_measure
+
+
+def filter_unit_measure_by_id(id: int) -> dict and int:
+    session = Session()
+    get_unit_measure = session.query(UnitMeasure).filter(UnitMeasure.id == id).first()
+    session.close()
+    if get_unit_measure:
+        return {
+            "data": {
+                "id": get_unit_measure.id,
+                "name": get_unit_measure.name
+            },
+            "message": "Unit Measure found."
+        }, 200
+    else:
+        return {
+            "message": "Unit Measure not found.",
+            "error": "Not Found"
+        }, 404
+
+
+def update_unit_measure(id: int, name: str) -> dict and int:
+    try:
+        session = Session()
+        get_unit_measure = session.query(UnitMeasure).filter(UnitMeasure.id == id).first()
+        if get_unit_measure:
+            get_unit_measure.name = name
+            session.commit()
+            session.refresh(get_unit_measure)
+            session.close()
+            return {
+                "data": {
+                    "id": get_unit_measure.id,
+                    "name": get_unit_measure.name
+                },
+                "message": "Unit Measure updated successfully."
+            }, 200
+        else:
+            return {
+                "message": "Unit Measure not found.",
+                "error": "Not Found"
+            }, 404
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
+
+
+def delete_unit_measure(id: int) -> dict and int:
+    try:
+        session = Session()
+        get_unit_measure = session.query(UnitMeasure).filter(UnitMeasure.id == id).first()
+        if get_unit_measure:
+            session.delete(get_unit_measure)
+            session.commit()
+            session.close()
+            return {
+                "message": "Unit Measure deleted successfully."
+            }, 200
+        else:
+            return {
+                "message": "Unit Measure not found.",
+                "error": "Not Found"
+            }, 404
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
