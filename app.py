@@ -21,7 +21,7 @@ def get_all_unit_measure():
 
 
 @app.route('/unit-measure', methods=['POST'])
-def create_unit_measure():
+def add_unit_measure():
     data = app.current_request.json_body
     name = data.get('name')
     if not (name):
