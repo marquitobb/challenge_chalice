@@ -3,6 +3,7 @@ from chalicelib.controllers.unit_measure_controller import (
     list_unit_measure, create_unit_measure, filter_unit_measure_by_id, update_unit_measure,
     update_unit_measure, delete_unit_measure
 )
+from chalicelib.controllers.products_controller import list_product
 
 app = Chalice(app_name='challenge')
 
@@ -71,5 +72,15 @@ def delete_unit_measure_by_id(id):
     response_data, status_code = delete_unit_measure(id=id)
     return Response(
         body=response_data,
+        status_code=status_code,
+    )
+
+
+# endpoint for product
+@app.route('/product', methods=['GET'])
+def get_all_product():
+    get_product, status_code = list_product()
+    return Response(
+        body=get_product,
         status_code=status_code,
     )
