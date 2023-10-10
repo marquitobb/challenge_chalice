@@ -28,3 +28,32 @@ def list_product() -> dict and int:
             "error": "Internal Server Error"
         }, 500
 
+
+def create_product(name: str, price: int, unit_measure_id: int) -> dict and int:
+    session = Session()
+    try:
+        product = Product(name=name, price=price, unit_measure_id=unit_measure_id)
+        session.add(product)
+        session.commit()
+        data = {
+            "id": product.id,
+            "name": product.name,
+            "price": product.price,
+            "unit_measure_id": product.unit_measure_id,
+            "unit_measure": {
+                "id": product.unit_measure.id,
+                "name": product.unit_measure.name
+            }
+        }
+        return {
+            "data": data,
+            "message": "Product created."
+        }, 201
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
+    finally:
+        session.close()
+

@@ -3,7 +3,9 @@ from chalicelib.controllers.unit_measure_controller import (
     list_unit_measure, create_unit_measure, filter_unit_measure_by_id, update_unit_measure,
     update_unit_measure, delete_unit_measure
 )
-from chalicelib.controllers.products_controller import list_product
+from chalicelib.controllers.products_controller import (
+    list_product, create_product
+)
 
 app = Chalice(app_name='challenge')
 
@@ -84,3 +86,25 @@ def get_all_product():
         body=get_product,
         status_code=status_code,
     )
+
+@app.route('/product', methods=['POST'])
+def add_product():
+    data = app.current_request.json_body
+    name = data.get('name')
+    price = data.get('price')
+    unit_measure_id = data.get('unit_measure_id')
+    if not (name and price and unit_measure_id):
+        return Response(
+            body={
+                "message": "Name, price and unit measure id are required",
+                "error": "Incorrect request body."
+            },
+            status_code=400,
+        )
+
+    response_data, status_code = create_product(name=name, price=price, unit_measure_id=unit_measure_id)
+    return Response(
+        body=response_data,
+        status_code=status_code,
+    )
+
