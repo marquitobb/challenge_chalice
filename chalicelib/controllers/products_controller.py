@@ -125,3 +125,26 @@ def update_product(id: int, name: str, price: int, unit_measure_id: int) -> dict
     finally:
         session.close()
 
+
+def delete_product(id: int) -> dict and int:
+    session = Session()
+    try:
+        get_product = session.query(Product).filter_by(id=id).first()
+        if not get_product:
+            return {
+                "message": "Product not found.",
+                "error": "Not Found."
+            }, 404
+        session.delete(get_product)
+        session.commit()
+        return {
+            "message": "Product deleted."
+        }, 200
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
+    finally:
+        session.close()
+

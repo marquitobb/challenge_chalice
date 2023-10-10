@@ -1,10 +1,11 @@
 from chalice import Chalice, Response
 from chalicelib.controllers.unit_measure_controller import (
     list_unit_measure, create_unit_measure, filter_unit_measure_by_id, update_unit_measure,
-    update_unit_measure, delete_unit_measure
+    delete_unit_measure
 )
 from chalicelib.controllers.products_controller import (
-    list_product, create_product, filter_product_by_id, update_product
+    list_product, create_product, filter_product_by_id, update_product,
+    delete_product
 )
 
 app = Chalice(app_name='challenge')
@@ -135,6 +136,15 @@ def update_product_by_id(id):
         )
 
     response_data, status_code = update_product(id=id, name=name, price=price, unit_measure_id=unit_measure_id)
+    return Response(
+        body=response_data,
+        status_code=status_code,
+    )
+
+
+@app.route('/product/{id}', methods=['DELETE'])
+def delete_product_by_id(id):
+    response_data, status_code = delete_product(id=id)
     return Response(
         body=response_data,
         status_code=status_code,
