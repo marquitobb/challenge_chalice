@@ -1,9 +1,7 @@
 from chalicelib.models.unit_measure_model import UnitMeasure, Session
 
 
-def create_unit_measure(
-    name: str,
-) -> dict and int:
+def create_unit_measure(name: str) -> dict and int:
     try:
         session = Session()
         unit_measure = UnitMeasure(name=name)
@@ -25,17 +23,26 @@ def create_unit_measure(
         }, 500
 
 
-def list_unit_measure() -> list:
-    get_all_unit_measure = list()
-    session = Session()
-    get_unit_measure = session.query(UnitMeasure).all()
-    for item in get_unit_measure:
-        get_all_unit_measure.append({
-            "id": item.id,
-            "name": item.name
-        })
-    session.close()
-    return get_all_unit_measure
+def list_unit_measure() -> dict and int:
+    try:
+        get_all_unit_measure = list()
+        session = Session()
+        get_unit_measure = session.query(UnitMeasure).all()
+        for item in get_unit_measure:
+            get_all_unit_measure.append({
+                "id": item.id,
+                "name": item.name
+            })
+        session.close()
+        return {
+            "data": get_all_unit_measure,
+            "message": "Unit Measure found."
+        }, 200
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
 
 
 def filter_unit_measure_by_id(id: int) -> dict and int:

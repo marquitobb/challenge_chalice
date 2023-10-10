@@ -8,21 +8,28 @@ app = Chalice(app_name='challenge')
 
 @app.route('/')
 def index():
-    return {'hello': 'world'}
+    return {'Welcome': 'API Challenge'}
 
 
 @app.route('/unit-measure', methods=['GET'])
 def get_all_unit_measure():
-    return {"data": list_unit_measure()}
+    get_unit_measure, status_code = list_unit_measure()
+    return Response(
+        body=get_unit_measure,
+        status_code=status_code,
+    )
 
 
 @app.route('/unit-measure', methods=['POST'])
-def get_all_unit_measure():
+def create_unit_measure():
     data = app.current_request.json_body
     name = data.get('name')
     if not (name):
         return Response(
-            body={'error': 'Name factor are required.'},
+            body={
+                "message": "Name factor are required",
+                "error": "Incorrect request body."
+            },
             status_code=400,
         )
 
