@@ -57,3 +57,34 @@ def create_product(name: str, price: int, unit_measure_id: int) -> dict and int:
     finally:
         session.close()
 
+
+def filter_product_by_id(id: int) -> dict and int:
+    session = Session()
+    try:
+        get_product = session.query(Product).filter_by(id=id).first()
+        if not get_product:
+            return {
+                "message": "Product not found.",
+                "error": "Not Found."
+            }, 404
+        data = {
+            "id": get_product.id,
+            "name": get_product.name,
+            "price": get_product.price,
+            "unit_measure_id": get_product.unit_measure_id,
+            "unit_measure": {
+                "id": get_product.unit_measure.id,
+                "name": get_product.unit_measure.name
+            }
+        }
+        return {
+            "data": data,
+            "message": "Product found."
+        }, 200
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
+    finally:
+        session.close()
