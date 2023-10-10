@@ -88,3 +88,40 @@ def filter_product_by_id(id: int) -> dict and int:
         }, 500
     finally:
         session.close()
+
+
+def update_product(id: int, name: str, price: int, unit_measure_id: int) -> dict and int:
+    session = Session()
+    try:
+        get_product = session.query(Product).filter_by(id=id).first()
+        if not get_product:
+            return {
+                "message": "Product not found.",
+                "error": "Not Found."
+            }, 404
+        get_product.name = name
+        get_product.price = price
+        get_product.unit_measure_id = unit_measure_id
+        session.commit()
+        data = {
+            "id": get_product.id,
+            "name": get_product.name,
+            "price": get_product.price,
+            "unit_measure_id": get_product.unit_measure_id,
+            "unit_measure": {
+                "id": get_product.unit_measure.id,
+                "name": get_product.unit_measure.name
+            }
+        }
+        return {
+            "data": data,
+            "message": "Product updated."
+        }, 200
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
+    finally:
+        session.close()
+
