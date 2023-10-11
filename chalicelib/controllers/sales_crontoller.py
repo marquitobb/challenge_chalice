@@ -1,0 +1,142 @@
+from chalicelib.models.models import Sale, Session
+
+
+def list_sale() -> dict and int:
+    session = Session()
+    try:
+        get_all_sale = list()
+        get_sale = session.query(Sale).all()
+        for item in get_sale:
+            get_all_sale.append({
+                "id": item.id,
+                "date": item.date.strftime("%Y-%m-%d"),
+                "quantity": item.quantity,
+                "product_id": item.product_id,
+                "product": {
+                    "id": item.product.id,
+                    "name": item.product.name,
+                    "price": item.product.price,
+                    "unit_measure_id": item.product.unit_measure_id,
+                    "unit_measure": {
+                        "id": item.product.unit_measure.id,
+                        "name": item.product.unit_measure.name
+                    }
+                }
+            })
+        return {
+            "data": get_all_sale,
+            "message": "Sale found."
+        }, 200
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
+    finally:
+        session.close()
+
+
+def create_sale(date: str, quantity: int, product_id: int) -> dict and int:
+    session = Session()
+    try:
+        sale = Sale(date=date, quantity=quantity, product_id=product_id)
+        session.add(sale)
+        session.commit()
+        return {
+            "message": "Sale added."
+        }, 201
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
+    finally:
+        session.close()
+
+
+def filter_sale_by_id(id: int) -> dict and int:
+    session = Session()
+    try:
+        get_sale = session.query(Sale).filter(Sale.id == id).first()
+        if get_sale:
+            return {
+                "data": {
+                    "id": get_sale.id,
+                    "date": get_sale.date.strftime("%Y-%m-%d"),
+                    "quantity": get_sale.quantity,
+                    "product_id": get_sale.product_id,
+                    "product": {
+                        "id": get_sale.product.id,
+                        "name": get_sale.product.name,
+                        "price": get_sale.product.price,
+                        "unit_measure_id": get_sale.product.unit_measure_id,
+                        "unit_measure": {
+                            "id": get_sale.product.unit_measure.id,
+                            "name": get_sale.product.unit_measure.name
+                        }
+                    }
+                },
+                "message": "Sale found."
+            }, 200
+        else:
+            return {
+                "message": "Sale not found.",
+                "error": "Not Found"
+            }, 404
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
+    finally:
+        session.close()
+
+
+def update_sale(id: int, date: str, quantity: int, product_id: int) -> dict and int:
+    session = Session()
+    try:
+        get_sale = session.query(Sale).filter(Sale.id == id).first()
+        if get_sale:
+            get_sale.date = date
+            get_sale.quantity = quantity
+            get_sale.product_id = product_id
+            session.commit()
+            return {
+                "message": "Sale updated."
+            }, 200
+        else:
+            return {
+                "message": "Sale not found.",
+                "error": "Not Found"
+            }, 404
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
+    finally:
+        session.close()
+
+
+def delete_sale(id: int) -> dict and int:
+    session = Session()
+    try:
+        get_sale = session.query(Sale).filter(Sale.id == id).first()
+        if get_sale:
+            session.delete(get_sale)
+            session.commit()
+            return {
+                "message": "Sale deleted."
+            }, 200
+        else:
+            return {
+                "message": "Sale not found.",
+                "error": "Not Found"
+            }, 404
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
+    finally:
+        session.close()

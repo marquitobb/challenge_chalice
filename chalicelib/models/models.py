@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 import os
@@ -21,6 +21,16 @@ class Product(Base):
     price = Column(Integer, nullable=False)
     unit_measure_id = Column(Integer, ForeignKey('unit_measure.id'), nullable=False)
     unit_measure = relationship('UnitMeasure', backref='products')
+
+
+class Sale(Base):
+    __tablename__ = 'sale'
+
+    id = Column(Integer, primary_key=True)
+    date = Column(Date, nullable=False)
+    quantity = Column(Integer, nullable=False)
+    product_id = Column(Integer, ForeignKey('product.id'), nullable=False)
+    product = relationship('Product', backref='sales')
 
 
 # connect to database
