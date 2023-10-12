@@ -1,10 +1,19 @@
 from chalicelib.models.models import Product, Session
+from chalicelib.utils.general_response import GeneralResponse
+
+PRODUCT_NOT_FOUND = "Product not found."
+NOT_FOUND = "Not Found."
 
 
 def list_product() -> dict and int:
+    """_summary_
+
+    Returns:
+        dict and int: return a dict with a list of products and a status code.
+    """
+    session = Session()
     try:
         get_all_product = list()
-        session = Session()
         get_product = session.query(Product).all()
         for item in get_product:
             get_all_product.append({
@@ -17,16 +26,11 @@ def list_product() -> dict and int:
                     "name": item.unit_measure.name
                 }
             })
-        session.close()
-        return {
-            "data": get_all_product,
-            "message": "Product found."
-        }, 200
+        return GeneralResponse.success(data=get_all_product, message="Product found.")
     except Exception as e:
-        return {
-            "message": str(e),
-            "error": "Internal Server Error"
-        }, 500
+        GeneralResponse.error(message=str(e))
+    finally:
+        session.close()
 
 
 def create_product(name: str, price: int, unit_measure_id: int) -> dict and int:
@@ -45,15 +49,9 @@ def create_product(name: str, price: int, unit_measure_id: int) -> dict and int:
                 "name": product.unit_measure.name
             }
         }
-        return {
-            "data": data,
-            "message": "Product created."
-        }, 201
+        return GeneralResponse.success(data=data, message="Product created.", status_code=201)
     except Exception as e:
-        return {
-            "message": str(e),
-            "error": "Internal Server Error"
-        }, 500
+        GeneralResponse.error(message=str(e))
     finally:
         session.close()
 
@@ -63,10 +61,7 @@ def filter_product_by_id(id: int) -> dict and int:
     try:
         get_product = session.query(Product).filter_by(id=id).first()
         if not get_product:
-            return {
-                "message": "Product not found.",
-                "error": "Not Found."
-            }, 404
+            return GeneralResponse.error(message=PRODUCT_NOT_FOUND, error_type=NOT_FOUND, status_code=404)
         data = {
             "id": get_product.id,
             "name": get_product.name,
@@ -77,15 +72,9 @@ def filter_product_by_id(id: int) -> dict and int:
                 "name": get_product.unit_measure.name
             }
         }
-        return {
-            "data": data,
-            "message": "Product found."
-        }, 200
+        return GeneralResponse.success(data=data, message="Product found.")
     except Exception as e:
-        return {
-            "message": str(e),
-            "error": "Internal Server Error"
-        }, 500
+        return GeneralResponse.error(message=str(e))
     finally:
         session.close()
 
@@ -95,10 +84,7 @@ def update_product(id: int, name: str, price: int, unit_measure_id: int) -> dict
     try:
         get_product = session.query(Product).filter_by(id=id).first()
         if not get_product:
-            return {
-                "message": "Product not found.",
-                "error": "Not Found."
-            }, 404
+            return GeneralResponse.error(message=PRODUCT_NOT_FOUND, error_type=NOT_FOUND, status_code=404)
         get_product.name = name
         get_product.price = price
         get_product.unit_measure_id = unit_measure_id
@@ -113,15 +99,9 @@ def update_product(id: int, name: str, price: int, unit_measure_id: int) -> dict
                 "name": get_product.unit_measure.name
             }
         }
-        return {
-            "data": data,
-            "message": "Product updated."
-        }, 200
+        return GeneralResponse.success(data=data, message="Product updated.")
     except Exception as e:
-        return {
-            "message": str(e),
-            "error": "Internal Server Error"
-        }, 500
+        return GeneralResponse.error(message=str(e))
     finally:
         session.close()
 
@@ -131,20 +111,12 @@ def delete_product(id: int) -> dict and int:
     try:
         get_product = session.query(Product).filter_by(id=id).first()
         if not get_product:
-            return {
-                "message": "Product not found.",
-                "error": "Not Found."
-            }, 404
+            return GeneralResponse.error(message=PRODUCT_NOT_FOUND, error_type=NOT_FOUND, status_code=404)
         session.delete(get_product)
         session.commit()
-        return {
-            "message": "Product deleted."
-        }, 200
+        return GeneralResponse.success(message="Product deleted.")
     except Exception as e:
-        return {
-            "message": str(e),
-            "error": "Internal Server Error"
-        }, 500
+        return GeneralResponse.error(message=str(e))
     finally:
         session.close()
 
