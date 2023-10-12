@@ -9,7 +9,7 @@ from chalicelib.controllers.products_controller import (
 )
 from chalicelib.controllers.sales_crontoller import (
     list_sale, create_sale, filter_sale_by_id, update_sale,
-    delete_sale
+    delete_sale, get_sales_by_products, get_all_sales_by_products
 )
 
 
@@ -222,6 +222,26 @@ def update_sale_by_id(id):
 @app.route('/sale/{id}', methods=['DELETE'])
 def delete_sale_by_id(id):
     response_data, status_code = delete_sale(id=id)
+    return Response(
+        body=response_data,
+        status_code=status_code,
+    )
+
+
+# endpoint for product sales
+@app.route('/product-sales', methods=['GET'])
+def get_product_sales():
+    response_data, status_code = get_sales_by_products()
+    return Response(
+        body=response_data,
+        status_code=status_code,
+    )
+
+
+# endpoint for total sales
+@app.route('/total-sales', methods=['GET'])
+def get_sales():
+    response_data, status_code = get_all_sales_by_products()
     return Response(
         body=response_data,
         status_code=status_code,

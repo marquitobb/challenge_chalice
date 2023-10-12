@@ -1,4 +1,5 @@
-from chalicelib.models.models import Sale, Session
+from chalicelib.models.models import Sale, Session, Product
+from sqlalchemy import func
 
 
 def list_sale() -> dict and int:
@@ -133,6 +134,59 @@ def delete_sale(id: int) -> dict and int:
                 "message": "Sale not found.",
                 "error": "Not Found"
             }, 404
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
+    finally:
+        session.close()
+
+# filter sales to products
+def get_sales_by_products() -> dict and int:
+    session = Session()
+    try:
+        list_each_product = list()
+        sales_by_product = session.query(
+            Product.name,
+            func.sum(Sale.quantity).label('total_sales'),
+            func.sum(Sale.quantity * Product.price).label('total_price')
+        ).join(Sale).group_by(Product.name).all()
+        for item in sales_by_product:
+            list_each_product.append({
+                "name": item.name,
+                "total_sales": item.total_sales,
+                "total_price": item.total_price
+            })
+        return {
+            "data": list_each_product,
+            "message": "Sale found."
+        }, 200
+    except Exception as e:
+        return {
+            "message": str(e),
+            "error": "Internal Server Error"
+        }, 500
+    finally:
+        session.close()
+
+
+# filter the sales of all products
+def get_all_sales_by_products() -> dict and int:
+    session = Session()
+    try:
+        get_each_sale_by_product = get_sales_by_products()
+        data = {
+            "total_sales": 0,
+            "total_price": 0
+        }
+        for item in get_each_sale_by_product[0]["data"]:
+            data["total_sales"] += item["total_sales"]
+            data["total_price"] += item["total_price"]
+        return {
+            "data": data,
+            "message": "Sale found."
+        }, 200
     except Exception as e:
         return {
             "message": str(e),
